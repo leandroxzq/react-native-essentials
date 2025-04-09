@@ -8,7 +8,12 @@ import {
 	TouchableOpacity,
 } from "react-native"
 
-function Login() {
+import { Plus, ArrowLeft } from 'lucide-react-native';
+
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+
+function Login({ navigation }) {
 	return (
 		<View style={styles.container}>
 			<View style={styles.column}>
@@ -23,11 +28,11 @@ function Login() {
 				<Text style={styles.text}>Senha</Text>
 				<TextInput style={styles.input} />
 
-				<TouchableOpacity style={styles.button}>
-					<Text style={styles.buttonText}>Logar</Text>
+				<TouchableOpacity style={styles.button} onPress={() => navigation.navigate("Lista de Contatos")}>
+				<Text style={styles.buttonText}>Login</Text>
 				</TouchableOpacity>
 
-				<TouchableOpacity style={styles.button}>
+				<TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Registrar')}>
 					<Text style={styles.buttonText}>Cadastre-se</Text>
 				</TouchableOpacity>
 			</View>
@@ -87,6 +92,9 @@ const styles = StyleSheet.create({
 		minWidth: 350,
 		gap: 10,
 	},
+	row: {
+		flexDirection: "row"
+	},
 	logo: {
 		width: 70,
 		height: 70,
@@ -119,4 +127,115 @@ const styles = StyleSheet.create({
 	},
 })
 
-export default Esqueceu
+function Cadastrar ({ navigation }) {
+	return (
+		<View style={styles.container}>
+			<View style={styles.column}>
+				<Text style={styles.title}>Contatos</Text>
+				<ArrowLeft onPress={() => navigation.navigate('Lista de Contatos')}/>
+
+				<Text style={styles.text}>Nome</Text>
+				<TextInput style={styles.input} />
+				<Text style={styles.text}>Email</Text>
+				<TextInput style={styles.input} />
+				<Text style={styles.text}>Telefone</Text>
+				<TextInput style={styles.input} />
+				
+				<TouchableOpacity style={styles.button}>
+					<Text style={styles.buttonText}>Salvar</Text>
+				</TouchableOpacity>
+			</View>
+		</View>
+	)
+}
+
+function Contatos ({navigation}) {
+
+	const contatos = [
+		{
+		  name: 'Amy Farha',
+		  avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/ladylexy/128.jpg',
+		  number: '81 988553424'
+		},
+		{
+		  name: 'Chris Jackson',
+		  avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/adhamdannaway/128.jpg',
+		  number: '81 988553424'
+		},
+	
+	  ]
+	  
+	return (
+		<View style={styles.container}>
+			<View style={styles.column}>
+				<Text style={styles.title}>Lista de contatos</Text>
+				<Plus onPress={() => navigation.navigate('Usuario')}/>
+
+		
+
+				{contatos && (
+					contatos.map((user) => {
+						return (
+					
+						
+						<View style={styles.column} key={user.nome} >
+							<TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Modificar')}>
+								<View style={styles.row}>
+									<Image
+										style={styles.logo}
+										source={{
+											uri: "https://reactnative.dev/img/tiny_logo.png",
+										}}
+									/>
+									<Text style={styles.text}>{user.name}</Text>
+									<Text style={styles.text}>{user.number}</Text>
+								</View>
+							</TouchableOpacity>
+						</View>
+						)
+					})
+				)}
+			</View>
+		</View>
+	)
+} 
+
+function Modificar ({ navigation}) {
+	return (
+		<View style={styles.container}>
+			<View style={styles.column}>
+				<Text style={styles.title}>Contatos</Text>
+				<ArrowLeft onPress={() => navigation.navigate('Lista de Contatos')}/>
+
+				<Text style={styles.text}>Nome</Text>
+				<TextInput style={styles.input} />
+				<Text style={styles.text}>Email</Text>
+				<TextInput style={styles.input} />
+				<Text style={styles.text}>Telefone</Text>
+		
+
+				<TouchableOpacity style={styles.button}>
+					<Text style={styles.buttonText}>Salvar</Text>
+				</TouchableOpacity>
+			</View>
+		</View>
+	)
+}
+
+const Stack = createNativeStackNavigator();
+
+function App() {
+	return (
+		<NavigationContainer>
+			<Stack.Navigator initialRouteName="Login">
+				<Stack.Screen name="Login" component={Login} options={{ headerShown: false }}  />
+				<Stack.Screen name="Lista de Contatos" component={Contatos} options={{ headerShown: false }} />
+				<Stack.Screen name="Registrar" component={Registrar} options={{headerTitleAlign: 'center'}} />
+				<Stack.Screen name="Usuario" component={Cadastrar} />
+				<Stack.Screen name="Modificar" component={Modificar} />
+			</Stack.Navigator>
+		</NavigationContainer>
+	);
+}
+
+export default App

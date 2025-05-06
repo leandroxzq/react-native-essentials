@@ -5,8 +5,6 @@ import { View, StyleSheet } from "react-native"
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context"
 
 import { Home } from "./components/Home"
-import { Destination } from "./components/Destination"
-import { Messages } from "./components/Messages"
 
 const styles = StyleSheet.create({
 	container: {
@@ -22,7 +20,11 @@ export default () => {
 		<SafeAreaProvider>
 			<SafeAreaView style={styles.container}>
 				<View style={styles.container}>
-					<TabView value={index} onChange={setIndex} animationType="spring">
+					<TabView
+						value={index}
+						onChange={setIndex}
+						animationType="spring"
+					>
 						<TabView.Item
 							style={{
 								flex: 1,
@@ -32,13 +34,19 @@ export default () => {
 						>
 							<Home />
 						</TabView.Item>
-						<TabView.Item style={{ backgroundColor: "blue", width: "100%" }}>
-							<Destination />
+						<TabView.Item
+							style={{ backgroundColor: "blue", width: "100%" }}
+						>
+							<Text h1>Favorite</Text>
 						</TabView.Item>
-						<TabView.Item style={{ backgroundColor: "green", width: "100%" }}>
-							<Messages />
+						<TabView.Item
+							style={{ backgroundColor: "green", width: "100%" }}
+						>
+							<Text h1>Cart</Text>
 						</TabView.Item>
-						<TabView.Item style={{ backgroundColor: "yellow", width: "100%" }}>
+						<TabView.Item
+							style={{ backgroundColor: "yellow", width: "100%" }}
+						>
 							<Text h1>Cart</Text>
 						</TabView.Item>
 					</TabView>

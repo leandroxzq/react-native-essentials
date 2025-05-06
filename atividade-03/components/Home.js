@@ -1,15 +1,9 @@
-import React from "react"
+import { useState, useEffect } from "react"
+import axios from "axios"
 import { View, StyleSheet, Image, Text } from "react-native"
 
 import { SearchBar } from "@rneui/themed"
 import { Card } from "@rneui/themed"
-
-import img1 from "../img/1.png"
-import img2 from "../img/2.png"
-import img3 from "../img/3.png"
-import img4 from "../img/4.png"
-import img5 from "../img/5.png"
-import img6 from "../img/6.png"
 
 const styles = StyleSheet.create({
 	header: {
@@ -111,73 +105,57 @@ const styles = StyleSheet.create({
 })
 
 export function Home() {
-	const [search, setSearch] = React.useState("")
+	const [search, setSearch] = useState("")
+	const [categories, setCategories] = useState([])
+	const [user, setUser] = useState([])
+	const [doctors, setDoctors] = useState([])
+
+	const fetchData = async () => {
+		try {
+			const [getUser, getCat, getDoc] = await Promise.all([
+				axios.get("http://localhost:3000/user"),
+				axios.get("http://localhost:3000/categories"),
+				axios.get("http://localhost:3000/doctors")
+			])
+	
+			setUser(getUser.data)
+			setCategories(getCat.data)
+			setDoctors(getDoc.data)
+		} catch (e) {
+			console.log(e)
+		}
+	}
+
+	useEffect(() => {
+		fetchData()
+	}, [])
 
 	const updateSearch = (search) => {
 		setSearch(search)
 	}
 
-	const user = {
-		name: "Dani Martinez",
-		avatar: "https://brasil.emeritus.org/wp-content/uploads/2020/01/gesta%CC%83o-de-pessoas-.jpg.optimal.jpg",
-	}
-
-	const categories = [
-		{
-			img: img1,
-			title: "Consultation",
-		},
-		{
-			img: img2,
-			title: "Dentist",
-		},
-		{
-			img: img3,
-			title: "Cardiologist",
-		},
-		{
-			img: img4,
-			title: "Hospital",
-		},
-		{
-			img: img5,
-			title: "Emergency",
-		},
-		{
-			img: img6,
-			title: "Laboratory",
-		},
-	]
-
-	const doctors = [
-		{
-			image: "https://portalhospitaisbrasil.com.br/wp-content/uploads/2021/05/Foto-doutora-Ana-Elisa.jpg",
-			name: "Olivia Wilson",
-			acting: "Consultant - Physiotherapy",
-			review: "⭐ 4.9 (37 Reviews)",
-		},
-		{
-			image: "https://media.istockphoto.com/id/1470505351/es/foto/retrato-de-un-m%C3%A9dico-sonriente-sosteniendo-gafas-y-un-tel%C3%A9fono-m%C3%B3vil-en-la-oficina.jpg?s=612x612&w=0&k=20&c=OIYevrDE-A0xcWS3PpTEYGDh5yQt9ordPOGBYEqAegg=",
-			name: "Jhonatan Patterson",
-			acting: "Consultant - Physiotherapy",
-			review: "⭐ 4.9 (37 Reviews)",
-		},
-	]
-
 	return (
 		<>
 			<Card containerStyle={styles.header}>
 				<View style={styles.headerUser}>
-					<Image
-						style={styles.image}
-						resizeMode="cover"
-						source={user.avatar}
-					/>
-					<View>
-						<Text style={styles.headerWelcome}>Welcome</Text>
-						<Text style={styles.name}>{user.name}</Text>
+				{user.map((user) => {
+					return (
+					<View
+					key={user.name}>
+						<Image
+							
+							style={styles.image}
+							resizeMode="cover"
+							source={user.avatar}
+						/>
+						<View>
+							<Text style={styles.headerWelcome}>Welcome</Text>
+							<Text style={styles.name}>{user.name}</Text>
+						</View>
 					</View>
-				</View>
+					)
+					})}
+				</View>	
 				<SearchBar
 					placeholder="Search doctor"
 					onChangeText={updateSearch}

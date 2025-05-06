@@ -1,4 +1,5 @@
-import React from "react"
+import axios from "axios"
+import { useState, useEffect } from "react"
 import {
 	View,
 	Text,
@@ -8,10 +9,35 @@ import {
 	ScrollView,
 	TouchableOpacity,
 } from "react-native"
+
 import { Icon } from "@rneui/themed"
 import { SafeAreaView } from "react-native-safe-area-context"
 
 export const Destination = () => {
+	const [categories, setCategories] = useState([])
+	const [popular, setPopular] = useState([])
+	const [recommended, setRecommended] = useState([])
+
+	useEffect(() => {
+		const fetchData = async () => {
+		  try {
+			const [catRes, popRes, recRes] = await Promise.all([
+			  axios.get('http://localhost:3000/categoriesDoc'),
+			  axios.get('http://localhost:3000/popular'),
+			  axios.get('http://localhost:3000/recommended'),
+			])
+	
+			setCategories(catRes.data)
+			setPopular(popRes.data)
+			setRecommended(recRes.data)
+		  } catch (error) {
+			console.error('Erro ao buscar dados:', error)
+		  }
+		}
+	
+		fetchData()
+	  }, [])
+
 	return (
 		<SafeAreaView style={styles.container}>
 			<View style={styles.header}>
@@ -87,38 +113,6 @@ export const Destination = () => {
 		</SafeAreaView>
 	)
 }
-
-const categories = [
-	{ name: "Resort", icon: "beach" },
-	{ name: "Homestay", icon: "home-city" },
-	{ name: "Hotel", icon: "office-building" },
-	{ name: "Lodge", icon: "warehouse" },
-	{ name: "Villa", icon: "home-variant" },
-	{ name: "Apartment", icon: "city-variant" },
-	{ name: "Hostel", icon: "bed-empty" },
-	{ name: "See all", icon: "dots-grid" },
-]
-
-const popular = [
-	{
-		img: "https://plus.unsplash.com/premium_photo-1744991859949-6297ee4b8f96?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-	},
-	{
-		img: "https://images.unsplash.com/photo-1745172366995-a55968e94797?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-	},
-	{
-		img: "https://plus.unsplash.com/premium_photo-1676423883826-574b115cb955?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-	},
-]
-
-const recommended = [
-	{
-		img: "https://images.unsplash.com/photo-1573005155278-db2aad160995?q=80&w=1972&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-	},
-	{
-		img: "https://images.unsplash.com/photo-1638397157670-b73dbb925e01?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-	},
-]
 
 const styles = StyleSheet.create({
 	container: {

@@ -1,70 +1,27 @@
-import React from "react"
+import axios from "axios"
+import { useState, useEffect} from "react"
 import { View, StyleSheet, FlatList, Image, Text } from "react-native"
 import { Icon, Badge } from "@rneui/themed"
 
-const messages = [
-	{
-		id: "1",
-		name: "Claudia Alves",
-		message: "Do more of what you love.",
-		time: "3m ago",
-		unread: 3,
-		avatar: "https://randomuser.me/api/portraits/women/1.jpg",
-	},
-	{
-		id: "2",
-		name: "Dani Martinez",
-		message: "Do your own thing.",
-		time: "5m ago",
-		unread: 1,
-		avatar: "https://randomuser.me/api/portraits/men/2.jpg",
-	},
-	{
-		id: "3",
-		name: "Kimberly Nguyen",
-		message: "Kindness is beautiful.",
-		time: "1h ago",
-		unread: 2,
-		avatar: "https://randomuser.me/api/portraits/women/3.jpg",
-	},
-	{
-		id: "4",
-		name: "Mariana Napolitani",
-		message: "Live your purpose.",
-		time: "2h ago",
-		unread: 1,
-		avatar: "https://randomuser.me/api/portraits/women/4.jpg",
-	},
-	{
-		id: "5",
-		name: "Olivia Wilson",
-		message: "You got this.",
-		time: "5h ago",
-		unread: 0,
-		avatar: "https://randomuser.me/api/portraits/women/5.jpg",
-	},
-	{
-		id: "6",
-		name: "Rachelle Beaudry",
-		message: "You're wonderful.",
-		time: "Yesterday",
-		unread: 0,
-		avatar: "https://randomuser.me/api/portraits/women/6.jpg",
-	},
-	{
-		id: "7",
-		name: "Soo Jin Ae",
-		message: "Keep it simple.",
-		time: "Yesterday",
-		unread: 0,
-		avatar: "https://randomuser.me/api/portraits/women/7.jpg",
-	},
-]
-
 export const Messages = () => {
+	const [messages, setMessages] = useState([])
+
+	const fetchData = async () => {
+		try {
+			const response = await axios.get("http://localhost:3000/messages")
+
+			setMessages(response.data)
+		} catch (error) {
+			console.error('Erro ao buscar dados:', error)
+		}
+	}
+
+	useEffect(() => {
+		fetchData()
+	}, [])
+
 	return (
 		<View style={styles.container}>
-			{/* Header */}
 			<View style={styles.header}>
 				<Icon
 					name="mail-open"

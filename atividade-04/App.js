@@ -15,76 +15,10 @@ import { Plus } from "lucide-react-native"
 import { NavigationContainer } from "@react-navigation/native"
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
 
-function Login({ navigation }) {
-	return (
-		<View style={styles.container}>
-			<View style={styles.column}>
-				<Image
-					style={styles.logo}
-					source={{
-						uri: "https://www.iconpacks.net/icons/2/free-user-icon-3296-thumb.png",
-					}}
-				/>
-				<Text style={styles.text}>Email</Text>
-				<TextInput style={styles.input} />
-				<Text style={styles.text}>Senha</Text>
-				<TextInput style={styles.input} />
+import { Login } from "./components/Login"
+import { Registrar } from "./components/Registrar"
 
-				<TouchableOpacity
-					style={styles.button}
-					onPress={() => navigation.navigate("Lista de Contatos")}
-				>
-					<Text style={styles.buttonText}>Login</Text>
-				</TouchableOpacity>
-
-				<TouchableOpacity
-					style={styles.button}
-					onPress={() => navigation.navigate("Registrar")}
-				>
-					<Text style={styles.buttonText}>Cadastre-se</Text>
-				</TouchableOpacity>
-			</View>
-		</View>
-	)
-}
-
-function Registrar() {
-	return (
-		<View style={styles.container}>
-			<View style={styles.column}>
-				<Text style={styles.text}>Nome</Text>
-				<TextInput style={styles.input} />
-				<Text style={styles.text}>Email</Text>
-				<TextInput style={styles.input} />
-				<Text style={styles.text}>CPF</Text>
-				<TextInput style={styles.input} />
-				<Text style={styles.text}>Senha</Text>
-				<TextInput style={styles.input} />
-
-				<TouchableOpacity style={styles.button}>
-					<Text style={styles.buttonText}>Cadastrar</Text>
-				</TouchableOpacity>
-			</View>
-		</View>
-	)
-}
-
-function Esqueceu() {
-	return (
-		<View style={styles.container}>
-			<View style={styles.column}>
-				<Text style={styles.title}>Esqueceu a senha</Text>
-
-				<Text style={styles.text}>Email</Text>
-				<TextInput style={styles.input} />
-
-				<TouchableOpacity style={styles.button}>
-					<Text style={styles.buttonText}>Enviar</Text>
-				</TouchableOpacity>
-			</View>
-		</View>
-	)
-}
+import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
 
 function Cadastrar({ navigation }) {
 	const [nome, setNome] = useState("")
@@ -153,17 +87,40 @@ function Contatos({ navigation }) {
 		}
 	}
 
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      navigation.navigate('Login');
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const auth = getAuth();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
 	useEffect(() => {
 		consultarDados()
+
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setIsLoggedIn(!!user);
+    });
+    return () => unsubscribe();
 	}, [])
 
 	return (
 		<View>
 			<View style={styles.column}>
+      {isLoggedIn && (
+        <TouchableOpacity onPress={handleLogout}>
+          <Text >Sair</Text>
+        </TouchableOpacity>
+      )}
 				{contatos &&
 					contatos.map((user) => {
 						return (
 							<View style={styles.column} key={user.name}>
+               
 								<TouchableOpacity
 									style={styles.contant}
 									onPress={() => navigation.navigate("Modificar")}

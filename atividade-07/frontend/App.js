@@ -14,7 +14,7 @@ import * as ImagePicker from "expo-image-picker"
 
 const CLOUD_NAME = "dupkgrlpy"
 const UPLOAD_PRESET = "storage"
-const BACKEND_URL = "http://localhost:3001"
+const BACKEND_URL = "http://10.31.33.30:3002"
 
 export default function App() {
 	const [images, setImages] = useState([])
@@ -37,8 +37,7 @@ export default function App() {
 
 	const pickImage = async () => {
 		const result = await ImagePicker.launchImageLibraryAsync({
-			mediaTypes: ["images"],
-			allowsEditing: true,
+			mediaTypes: ImagePicker.MediaTypeOptions.Images,
 			quality: 1,
 		})
 
@@ -52,11 +51,11 @@ export default function App() {
 		const data = new FormData()
 		data.append("file", {
 			uri: photo.uri,
-			type: photo.type || "image/jpeg",
+			type: photo.mimeType || "image/jpeg",
 			name: photo.fileName || "upload.jpg",
 		})
 		data.append("upload_preset", UPLOAD_PRESET)
-		data.append("tags", "storage")
+		data.append("tags", "aula7ifpe")
 
 		try {
 			const res = await fetch(
@@ -64,11 +63,13 @@ export default function App() {
 				{
 					method: "POST",
 					body: data,
+          headers: {
+            "Content-Type": "multipart/form-data"
+          }
 				}
 			)
 			const result = await res.json()
 			if (result.secure_url) {
-				// Atualiza a lista local e também recarrega da API para garantir sincronização
 				setImages((prev) => [result, ...prev])
 			} else {
 				Alert.alert("Erro no upload", "Falha ao enviar imagem para Cloudinary")
@@ -87,7 +88,7 @@ export default function App() {
 	const loadImages = async () => {
 		setLoadingImages(true)
 		try {
-			const res = await fetch(`${BACKEND_URL}/images`)
+			const res = await fetch(`${BACKEND_URL}/images?tag=aula7ifpe`)
 			const data = await res.json()
 			setImages(data)
 		} catch (error) {
@@ -97,36 +98,26 @@ export default function App() {
 		}
 	}
 
-	const deleteImage = (public_id) => {
-		Alert.alert("Deletar imagem", "Deseja realmente remover esta imagem?", [
-			{ text: "Cancelar", style: "cancel" },
-			{
-				text: "Remover",
-				style: "destructive",
-				onPress: async () => {
-					try {
-						const res = await fetch(`${BACKEND_URL}/delete-image`, {
-							method: "DELETE",
-							headers: { "Content-Type": "application/json" },
-							body: JSON.stringify({ public_id }),
-						})
-						const json = await res.json()
+	const deleteImage = async (public_id) => {
+  try {
+    const res = await fetch(`${BACKEND_URL}/delete-image`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ public_id }),
+    })
+    const json = await res.json()
 
-						if (json.result === "ok") {
-							setImages((prev) =>
-								prev.filter((img) => img.public_id !== public_id)
-							)
-							Alert.alert("Sucesso", "Imagem deletada")
-						} else {
-							Alert.alert("Erro", "Falha ao deletar imagem")
-						}
-					} catch (error) {
-						Alert.alert("Erro", error.message)
-					}
-				},
-			},
-		])
-	}
+    if (json.result === "ok") {
+      setImages((prev) => prev.filter((img) => img.public_id !== public_id))
+      Alert.alert("Sucesso", "Imagem deletada")
+    } else {
+      Alert.alert("Erro", "Falha ao deletar imagem")
+    }
+  } catch (error) {
+    Alert.alert("Erro", error.message)
+  }
+}
+
 
 	const renderItem = ({ item }) => (
 		<View style={styles.imageContainer}>

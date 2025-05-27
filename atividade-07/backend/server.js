@@ -11,14 +11,13 @@ cloudinary.config({
 })
 
 const app = express()
-const PORT = 3001
+const PORT = 3002
 
 app.use(cors())
 app.use(bodyParser.json())
 
-// ✅ Listar imagens com uma tag (usa o upload_preset como tag)
 app.get("/images", async (req, res) => {
-	const { tag = "storage" } = req.query
+	const { tag = "aula7ifpe" } = req.query
 	try {
 		const result = await cloudinary.api.resources_by_tag(tag, {
 			type: "upload",
@@ -32,8 +31,7 @@ app.get("/images", async (req, res) => {
 	}
 })
 
-// ✅ Deletar imagem por public_id
-app.post("/delete-image", async (req, res) => {
+app.delete("/delete-image", async (req, res) => {
 	const { public_id } = req.body
 	if (!public_id) {
 		return res.status(400).json({ error: "public_id é obrigatório" })
@@ -47,6 +45,6 @@ app.post("/delete-image", async (req, res) => {
 	}
 })
 
-app.listen(PORT, () => {
+app.listen(PORT, "0.0.0.0", () => {
 	console.log(`Servidor rodando em http://localhost:${PORT}`)
 })

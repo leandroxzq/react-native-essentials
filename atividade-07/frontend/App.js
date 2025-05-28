@@ -12,9 +12,9 @@ import {
 } from "react-native"
 import * as ImagePicker from "expo-image-picker"
 
-const CLOUD_NAME = "dupkgrlpy"
-const UPLOAD_PRESET = "storage"
-const BACKEND_URL = "http://10.31.33.30:3002"
+const CLOUD_NAME = process.env.EXPO_PUBLIC_CLOUD_NAME
+const UPLOAD_PRESET = process.env.EXPO_PUBLIC_PRESET
+const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL
 
 export default function App() {
 	const [images, setImages] = useState([])
@@ -63,9 +63,9 @@ export default function App() {
 				{
 					method: "POST",
 					body: data,
-          headers: {
-            "Content-Type": "multipart/form-data"
-          }
+					headers: {
+						"Content-Type": "multipart/form-data",
+					},
 				}
 			)
 			const result = await res.json()
@@ -98,26 +98,40 @@ export default function App() {
 		}
 	}
 
-	const deleteImage = async (public_id) => {
-  try {
-    const res = await fetch(`${BACKEND_URL}/delete-image`, {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ public_id }),
-    })
-    const json = await res.json()
+	const deleteImage = (public_id) => {
+		Alert.alert(
+			"Confirmar exclusão",
+			"Tem certeza que deseja deletar esta imagem?",
+			[
+				{ text: "Cancelar", style: "cancel" },
+				{
+					text: "Deletar",
+					style: "destructive",
+					onPress: async () => {
+						try {
+							const res = await fetch(`${BACKEND_URL}/delete-image`, {
+								method: "DELETE",
+								headers: { "Content-Type": "application/json" },
+								body: JSON.stringify({ public_id }),
+							})
+							const json = await res.json()
 
-    if (json.result === "ok") {
-      setImages((prev) => prev.filter((img) => img.public_id !== public_id))
-      Alert.alert("Sucesso", "Imagem deletada")
-    } else {
-      Alert.alert("Erro", "Falha ao deletar imagem")
-    }
-  } catch (error) {
-    Alert.alert("Erro", error.message)
-  }
-}
-
+							if (json.result === "ok") {
+								setImages((prev) =>
+									prev.filter((img) => img.public_id !== public_id)
+								)
+								Alert.alert("Sucesso", "Imagem deletada")
+							} else {
+								Alert.alert("Erro", "Falha ao deletar imagem")
+							}
+						} catch (error) {
+							Alert.alert("Erro", error.message)
+						}
+					},
+				},
+			]
+		)
+	}
 
 	const renderItem = ({ item }) => (
 		<View style={styles.imageContainer}>
